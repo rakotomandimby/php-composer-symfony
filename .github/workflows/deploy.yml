@@ -22,6 +22,7 @@ jobs:
         run: |
           chmod +x ./get-composer-symfony.sh
           ./get-composer-symfony.sh
+          chmod +x ./bin/*
 
       - name: Deploy ./bin/ to FTP folder
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0

@@ -37,8 +37,6 @@ jobs:
           FTP_FOLDER: ${{ vars.FTP_FOLDER }}
         run: |
           lftp -u "${FTP_USER},${FTP_PASSWORD}" "${FTP_HOST}" <<EOF
-          set cmd:fail-exit yes
-          mkdir -p "${FTP_FOLDER}"
           cd "${FTP_FOLDER}"
           mirror -R --delete --verbose ./bin/ .
           chmod 755 composer

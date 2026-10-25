@@ -24,12 +24,25 @@ jobs:
           ./get-composer-symfony.sh
           chmod +x ./bin/*
 
-      - name: Deploy ./bin/ to FTP folder
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ vars.FTP_HOST }}
-          username: ${{ vars.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./bin/
-          server-dir: ${{ vars.FTP_FOLDER }}/
+      - name: Install lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Upload ./bin/ via FTP and enforce executable flags
+        env:
+          FTP_HOST: ${{ vars.FTP_HOST }}
+          FTP_USER: ${{ vars.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_FOLDER: ${{ vars.FTP_FOLDER }}
+        run: |
+          lftp -u "${FTP_USER},${FTP_PASSWORD}" "${FTP_HOST}" <<EOF
+          set cmd:fail-exit yes
+          mkdir -p "${FTP_FOLDER}"
+          cd "${FTP_FOLDER}"
+          mirror -R --delete --verbose ./bin/ .
+          chmod 755 composer
+          chmod 755 symfony
+          bye
+          EOF
 
